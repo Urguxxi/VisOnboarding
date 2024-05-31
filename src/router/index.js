@@ -20,6 +20,7 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   },
   {
+    // Direct to the view of Atlas
     path:'/atlas',
     name: 'atlas',
     component: AtlasView

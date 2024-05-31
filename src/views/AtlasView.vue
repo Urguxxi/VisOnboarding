@@ -2,17 +2,11 @@
     <div class="altasView">
       <!-- <h1>This is the demo page for Atlas❤️</h1> -->
       <AtlasSidebar class="left"/>
-      <AtlasViz class="right-top"/>
-      <AtlasLegend class="right-bottom"/>        
+      <!-- <AtlasViz class="right-top"/> -->
+      <AtlasLegend class="right-bottom"/>
+      <component :is="currentComponent" @hexClicked="handleHexClick" @backToAtlas="handleBackToAtlas" class="right-top"/>        
     </div>
     <br>
-    <!-- <div class="container">
-      <header>HEADER</header>
-      <nav>NAV</nav>
-      <main>MAIN</main>
-      <aside>ASIDE</aside>
-      <footer>FOOTER</footer>
-    </div> -->
 </template>
   
 
@@ -20,6 +14,7 @@
 import AtlasSidebar from '@/components/AtlasSidebar.vue'
 import AtlasViz from '@/components/AtlasViz.vue'
 import AtlasLegend from '@/components/AtlasLegend.vue'
+import HexViz from '@/components/HexViz.vue'
 
 export default {
   name: 'AtlasView',
@@ -27,6 +22,20 @@ export default {
     AtlasSidebar,
     AtlasViz,
     AtlasLegend,
+    HexViz,
+  },
+  data(){
+    return{
+      currentComponent:'AtlasViz',
+    }
+  },
+  methods:{
+    handleHexClick(){
+      this.currentComponent = 'HexViz';
+    },
+    handleBackToAtlas(){
+      this.currentComponent = 'AtlasViz';
+    }
   }
 }
 </script>
