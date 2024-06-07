@@ -6,7 +6,7 @@
 
 <style>
 .sidebar{
-    background-color: bisque;
+    background-color: rgb(198, 224, 196);
 
 }
 </style>

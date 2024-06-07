@@ -1,6 +1,7 @@
 <template>
     <div class="viz">
         The IPCC AR6 WGI inhabited regions are displayed as hexagons with identical size in their approximate geographical location (see legend for regional acronyms). 
+        <br>
     </div>
 </template>
 
@@ -18,7 +19,10 @@ export default {
   template: '<div></div>',
   methods:{
     handleClick(){
-        this.$emit('hexClicked');
+        this.$emit('toggleChanged');
+    },
+    handleBackClick(){
+        this.$emit('backToAtlas');
     }
   },
   mounted() {
@@ -572,12 +576,12 @@ export default {
     }
 
     // set a deault radius
-    const hexRadius = 36;
+    const hexRadius = 33;
     const x = 150;
     const y = 60;
     drawAtlas(hexRadius,x,y);
 
-    // test hexagons
+    // The small legend
     svg.append('polygon')
     .attr('points',hexagonPoints(50))
     .attr('transform','translate(100,400)')

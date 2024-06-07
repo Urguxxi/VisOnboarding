@@ -4,7 +4,8 @@
       <AtlasSidebar class="left"/>
       <!-- <AtlasViz class="right-top"/> -->
       <AtlasLegend class="right-bottom"/>
-      <component :is="currentComponent" @hexClicked="handleHexClick" @backToAtlas="handleBackToAtlas" class="right-top"/>        
+      <IntroTitle class="right-top" :isChecked="isHexVizActive" @toggleChanged="handleToggle" @hexClicked="handleHexClick" @backToAtlas="handleBackToAtlas"/>
+      <component :is="currentComponent"  @toggleChanged="handleToggle" class="right-top"/>        
     </div>
     <br>
 </template>
@@ -15,6 +16,7 @@ import AtlasSidebar from '@/components/AtlasSidebar.vue'
 import AtlasViz from '@/components/AtlasViz.vue'
 import AtlasLegend from '@/components/AtlasLegend.vue'
 import HexViz from '@/components/HexViz.vue'
+import IntroTitle from '@/components/IntroTitle.vue'
 
 export default {
   name: 'AtlasView',
@@ -23,10 +25,12 @@ export default {
     AtlasViz,
     AtlasLegend,
     HexViz,
+    IntroTitle,
   },
   data(){
     return{
       currentComponent:'AtlasViz',
+      isHexVizActive: false,
     }
   },
   methods:{
@@ -35,6 +39,10 @@ export default {
     },
     handleBackToAtlas(){
       this.currentComponent = 'AtlasViz';
+    },
+    handleToggle(){
+      this.isHexVizActive = !this.isHexVizActive;
+      this.currentComponent = this.currentComponent === 'AtlasViz' ? 'HexViz':'AtlasViz';
     }
   }
 }
