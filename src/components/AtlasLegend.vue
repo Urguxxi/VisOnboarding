@@ -16,10 +16,10 @@
     justify-content: center;
     flex: 1;
     align-items: center;
+    max-height: 100%;
 }
 
 
-/* CSS */
 .var {
   background-color: #FFFFFF;
   border: 0;
