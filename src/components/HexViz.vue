@@ -68,7 +68,7 @@
                 // the main viz
                 svg.append('polygon')
                 .attr('points',hexagonPoints(220))
-                .attr('transform','translate(600,280)')
+                .attr('transform','translate(700,280)')
                 .attr('id','bighex')
                 .style('stroke','darkgrey')
                 .style('fill','none')
