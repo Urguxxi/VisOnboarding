@@ -5,7 +5,7 @@
             <h3>{{category.name}}</h3>
             <div class="items">
                 <div v-for="item in category.items" :key="item.name" class="item">
-                    <input type="checkbox" v-model="item.selected" :id="item.name">
+                    <input type="checkbox" v-model="item.selected" :id="item.name" @change="emitSelectedCIDs" :disabled="item.disabled">
                     <label :for="item.name">{{item.name}}</label>
                 </div>
             </div>
@@ -16,72 +16,95 @@
 <script>
     export default{
         data(){
+            const enabledCIDs = [
+            "Cold spell",
+            "River flood",
+            "Severe wind storm",
+            "Permafrost",
+            "Coastal flood",
+            "Radiation at surface"
+        ];
+
             return{
                 categories:[
                     {
                         name:"Heat and Cold",
                         items:[
-                            {name: "Mean surface temperature", selected: false},
-                            {name: "Extreme heat", selected: false},
-                            {name: "Cold spell", selected: false},
-                            {name: "Frost", selected:false},
+                            {name: "Mean surface temperature", selected: false, disabled: true},
+                            {name: "Extreme heat", selected: false, disabled: true},
+                            {name: "Cold spell", selected: false, disabled: false},
+                            {name: "Frost", selected:false, disabled: true},
                         ]
                     },
                     {
                         name:"Wet and Dry",
                         items:[
-                            {name: "Mean precipitation", selected: false},
-                            {name: "River flood", selected: false},
-                            {name: "Heavy preciption and pluvial flood", selected: false},
-                            {name: "Landslide", selected: false},
-                            {name: "Aridity", selected: false},
-                            {name: "Hydrological drought", selected: false},
-                            {name: "Agricultural and ecological drought", selected: false},
-                            {name: "Fire weather", selected: false},
+                            {name: "Mean precipitation", selected: false, disabled: true},
+                            {name: "River flood", selected: false, disabled: false},
+                            {name: "Heavy preciption and pluvial flood", selected: false, disabled: true},
+                            {name: "Landslide", selected: false, disabled: true},
+                            {name: "Aridity", selected: false, disabled: true},
+                            {name: "Hydrological drought", selected: false, disabled: true},
+                            {name: "Agricultural and ecological drought", selected: false, disabled: true},
+                            {name: "Fire weather", selected: false, disabled: true},
                         ]
                     },
                     {
                         name: "Wind",
                         items: [
-                            {name: "Mean wind speed", selected: false},
-                            {name: "Severe wind storm", selected: false},
-                            {name: "Tropical cyclone", selected: false},
-                            {name: "Sand and dust storm", seleted: false},
+                            {name: "Mean wind speed", selected: false, disabled: true},
+                            {name: "Severe wind storm", selected: false, disabled: false},
+                            {name: "Tropical cyclone", selected: false, disabled: true},
+                            {name: "Sand and dust storm", seleted: false, disabled: true},
                         ]
                     },
                     {
                         name:"Snow and Ice",
                         items:[
-                            {name: "Snow, glacier and ice sheet", selected: false},
-                            {name: "Permafrost", selected: false},
-                            {name: "Lake, river and sea ice", selected: false},
-                            {name: "Heavy snowfall and ice storm", selected: false},
-                            {name: "Hail", selected: false},
-                            {name: "Snoe avalanche", selected: false},
+                            {name: "Snow, glacier and ice sheet", selected: false, disabled: true},
+                            {name: "Permafrost", selected: false, disabled: false},
+                            {name: "Lake, river and sea ice", selected: false, disabled: true},
+                            {name: "Heavy snowfall and ice storm", selected: false, disabled: true},
+                            {name: "Hail", selected: false, disabled: true},
+                            {name: "Snoe avalanche", selected: false, disabled: true},
                         ]
                     },
                     {
                         name: "Coastal",
                         items:[
-                            {name: "Relative sae level", selected: false},
-                            {name: "Coastal flood", selected: false},
-                            {name: "Coastal erosion", selected: false},
-                            {name: "Marine heatwave", selected: false},
-                            {name: "Ocean acidity", selected: false},
+                            {name: "Relative sae level", selected: false, disabled: true},
+                            {name: "Coastal flood", selected: false, disabled: false},
+                            {name: "Coastal erosion", selected: false, disabled: true},
+                            {name: "Marine heatwave", selected: false, disabled: true},
+                            {name: "Ocean acidity", selected: false, disabled: true},
                         ]
                     },
                     {
                         name: "Others",
                         items: [
-                            {name: "Air pollution weather", selected: false},
-                            {name: "Atmospheric CO₂ at surface", selected: false},
-                            {name: "Radiation at surface", selected: false},
+                            {name: "Air pollution weather", selected: false, disabled: true},
+                            {name: "Atmospheric CO₂ at surface", selected: false, disabled: true},
+                            {name: "Radiation at surface", selected: false, disabled: false},
 
                         ]
                     }
                 ]
             }
-        }
+        },
+        methods:{
+            // To update the selected CIDs and emit the event in AtlasView.vue
+            emitSelectedCIDs(){
+                let selectedItems = [];
+                this.categories.forEach(category => {
+                    category.items.forEach(item =>{
+                        if (item.selected){
+                            selectedItems.push(item.name);
+                        }
+                    })
+                })
+                this.$emit('cid-selection-changed',selectedItems);
+            },
+        },
     }
 </script>
 

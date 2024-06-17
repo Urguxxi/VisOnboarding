@@ -1,11 +1,9 @@
 <template>
     <div class="altasView">
-      <!-- <h1>This is the demo page for Atlas❤️</h1> -->
-      <AtlasSidebar class="left"/>
-      <!-- <AtlasViz class="right-top"/> -->
-      <AtlasLegend class="right-bottom"/>
+      <AtlasSidebar class="left" @cid-selection-changed="updateSelectedCIDs"/>
+      <AtlasLegend class="right-bottom" @visualization-mode-changed="updateActiveVisualizationMode"/>
       <IntroTitle class="right-top" :isChecked="isHexVizActive" @toggleChanged="handleToggle" @hexClicked="handleHexClick" @backToAtlas="handleBackToAtlas"/>
-      <component :is="currentComponent"  @toggleChanged="handleToggle" class="right-top"/>        
+      <component class="right-top" :is="currentComponent" :selected-cids="selectedCIDs" :visualization-mode="visualizationMode" @toggleChanged="handleToggle" />        
     </div>
     <br>
 </template>
@@ -31,6 +29,27 @@ export default {
     return{
       currentComponent:'AtlasViz',
       isHexVizActive: false,
+      selectedCIDs:[],
+      visualizationMode:{
+        futureProjection: false,
+        confidence: false,
+        observedTrend: false,
+        attribution: false,
+      }
+    }
+  },
+  watch: {
+    visualizationMode: {
+      handler(newValue) {
+        console.log('Updated visualizationMode:', newValue);
+      },
+      deep: true  // This ensures the watcher triggers even for nested property changes
+    },
+    selectedCIDs:{
+      handler(newValue) {
+        console.log('Updated selectedCIDs:', newValue);
+      },
+      deep: true  // This ensures the watcher triggers even for nested property changes
     }
   },
   methods:{
@@ -43,7 +62,30 @@ export default {
     handleToggle(){
       this.isHexVizActive = !this.isHexVizActive;
       this.currentComponent = this.currentComponent === 'AtlasViz' ? 'HexViz':'AtlasViz';
-    }
+    },
+    // To update the CIDs selected in the sidebar
+    updateSelectedCIDs(selectedItems){
+      this.selectedCIDs = selectedItems;
+    },
+    // To update which properties of CIDs to be shown
+    updateActiveVisualizationMode(mode){
+      // Toggle mode activation
+      if (this.visualizationMode[mode]){
+        this.visualizationMode[mode] = false;
+      }
+      else{
+        // The update should take the dependencied into consideration
+        if (mode === 'confidence' && !this.visualizationMode.futureProjection){
+          alert("Confidence requires Future Proejection to be active...");
+          return;
+        }
+        if (mode === 'attribution' && !this.visualizationMode.observedTrend){
+          alert("Attribution requires Observed Trend to be active...");
+          return;
+        }        
+        this.visualizationMode[mode] = true;
+      }
+    },
   }
 }
 </script>

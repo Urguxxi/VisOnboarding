@@ -1,11 +1,25 @@
 <template>
     <div class="lengend">
-        <button class="var">Future Projection</button>
+        <!-- <button class="var">Future Projection</button>
         <button class="var">Condfidence</button>
         <button class="var">Observed Trend</button>
-        <button class="var">Attribution</button>
+        <button class="var">Attribution</button> -->
+        <button v-for="mode in ['futureProjection', 'confidence', 'observedTrend', 'attribution']" class="var" :key="mode" @click="emitMode(mode)">
+            {{mode}}
+        </button>
     </div>
 </template>
+
+<script>
+export default{
+    methods:{
+        emitMode(mode){
+            this.$emit('visualization-mode-changed', mode);
+            alert('click succeeds!');
+        }
+    }
+}
+</script>
 
 <style>
 .lengend{
@@ -18,7 +32,6 @@
     align-items: center;
     max-height: 100%;
 }
-
 
 .var {
   background-color: #FFFFFF;
