@@ -79,7 +79,7 @@
                     ${-halfWidth},${-radius / 2}`;
                 };
 
-                // draw the legend hex
+                // draw the legend hex using the old function
                 svg.append('polygon')
                 .attr('points',hexagonPoints1(80))
                 .attr('transform','translate(150,400)')
@@ -108,7 +108,7 @@
                     const trianglePoints = this.computeTrianglePoints(index, hexRadius, hexCenterX, hexCenterY);
                     svg.append('polygon')
                     .attr('points', trianglePoints)
-                    .style('fill','red')
+                    .style('fill',this.determineColor(cid))
                     .style('stroke', 'orange')
                     .style('stroke-width', 3);
                 })
@@ -126,13 +126,18 @@
                 }
             },
 
-            // determineColor(cid) {
-            //     // Placeholder function to determine color based on the CID and mode
-            //     if (this.visualizationMode['futureProjection']) {
-            //         return 'lightblue'; // Example color for future projections
-            //     }
-            //     return 'grey'; // Default color
-            // },
+            determineColor(cid) {
+                const colors = {
+                    'Cold spell': '#ffcccc',
+                    'River flood': '#cceeff',
+                    'Severe wind storm':'lightyellow',
+                    'Permafrost':'#eeffcc',
+                    'Coastal flood':'blue',
+                    'Radiation at surface':'eeffee',
+                    // More CIDs can be added here
+                };
+                return colors[cid] || '#eeeeee'; // Default color if CID is not found
+            },
         },
 
     }
