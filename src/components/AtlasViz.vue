@@ -20,7 +20,7 @@ import * as d3 from 'd3';
 export default {
   name: 'AtlasViz',
   template: '<div></div>',
-  props: ['selectedCids', 'visualizationMode'],
+  props: ['selectedCIDs', 'visualizationMode','displayConfig'],
   mounted() {
     this.renderViz();
     },
@@ -50,7 +50,7 @@ export default {
         const container = d3.select(this.$refs.vizContainer);
         container.selectAll('svg').remove(); // To clear up the canva to redraw
 
-        const svg = d3.select(this.$el) // the error appears on the very first line of the d3-module
+        const svg = d3.select(this.$el)
         .append('svg')
         .attr('width', 1500)
         .attr('height', 550)

@@ -2,6 +2,7 @@
     <div class="hexViz" ref="hexContainer">
         Hey it's the onboarding for a single hexagon now!
         <button @click="handleBackClick">Back to Atlas</button>
+        <!-- <p>{{displayConfig.message}}</p> -->
     </div>
 </template>
 
@@ -10,27 +11,49 @@
 
     export default{
         name:'HexViz',
-        props: ['selectedCids', 'visualizationMode'],
+        props: ['selectedCids', 'visualizationMode','displayConfig'],
         mounted() {
             this.renderViz();
         },
         watch:{
-            selectedCIDs:{
+            selectedCids:{
                 handler(){
                     this.renderViz();
                 },
-                deep: true
+                deep: true,
+                immediate: true
             },
             visualizationMode:{
                 handler(){
                     this.renderViz();
                 },
-                deep: true
+                deep: true,
+                immediate: true
             }
         },
         methods:{
             handleBackClick(){
                 this.$emit('backToAtlas');
+            },
+            computeTrianglePoints(index, radius, centerX, centerY) {
+                // This is a placeholder function for computing triangle vertices
+                radius = radius -10;
+                const angle = Math.PI / 3 * index + Math.PI / 6;
+                const nextAngle = angle + Math.PI / 3;
+                return [
+                    [centerX, centerY], // center of the hexagon
+                    [centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle)],
+                    [centerX + radius * Math.cos(nextAngle), centerY + radius * Math.sin(nextAngle)]
+                ].map(point => point.join(',')).join(' ');
+            },
+            hexagonPoints(radius, centerX, centerY) {
+                return Array.from({ length: 6 }, (_, i) => {
+                    const angle = Math.PI / 3 * i - Math.PI / 2;
+                    return [
+                        centerX + radius * Math.cos(angle),
+                        centerY + radius * Math.sin(angle)
+                    ].join(',');
+                }).join(' ');
             },
             renderViz(){
                 const container = d3.select(this.$refs.hexContainer);
@@ -45,7 +68,7 @@
                 .attr('transform', 'translate(20, 0)');
 
                 //Set the points of hexagons
-                const hexagonPoints = (radius) => {
+                const hexagonPoints1 = (radius) => {
                 const halfWidth = radius * Math.sqrt(3) / 2;
                 return `
                     0,${-radius}
@@ -56,28 +79,45 @@
                     ${-halfWidth},${-radius / 2}`;
                 };
 
-                // the legend hex
+                // draw the legend hex
                 svg.append('polygon')
-                .attr('points',hexagonPoints(80))
+                .attr('points',hexagonPoints1(80))
                 .attr('transform','translate(150,400)')
                 .attr('id','ice')
                 .style('stroke','pink')
                 .style('fill','lightgrey')
                 .style('stroke-width',3);
 
-                // the main viz
+                // basic settings for the main HEX
+                const hexRadius = 220;
+                const hexCenterX = 700;
+                const hexCenterY = 280;
+
+                // Draw the main viz hexagon
                 svg.append('polygon')
-                .attr('points',hexagonPoints(220))
-                .attr('transform','translate(700,280)')
+                .attr('points',this.hexagonPoints(hexRadius, hexCenterX, hexCenterY))
+                // .attr('transform',`translate(${hexCenterX}, ${hexCenterY})`)
                 .attr('id','bighex')
                 .style('stroke','darkgrey')
                 .style('fill','none')
                 .style('stroke-width',5);
 
-                // To test if the mode is updated
+                // Dynamically draw the triangles based on the selected CIDs and the main HEX
+                this.selectedCids.forEach((cid, index) => {
+                    // To compute the triangles vertices based on the index?
+                    const trianglePoints = this.computeTrianglePoints(index, hexRadius, hexCenterX, hexCenterY);
+                    svg.append('polygon')
+                    .attr('points', trianglePoints)
+                    .style('fill','red')
+                    .style('stroke', 'orange')
+                    .style('stroke-width', 3);
+                })
+
+
+                // *To test if the mode is updated
                 if(this.visualizationMode['futureProjection']){
                     svg.append('polygon')
-                    .attr('points',hexagonPoints(50))
+                    .attr('points',hexagonPoints1(50))
                     .attr('transform','translate(200,400)')
                     .attr('id','ice')
                     .style('stroke','pink')
@@ -85,6 +125,14 @@
                     .style('stroke-width',3);
                 }
             },
+
+            // determineColor(cid) {
+            //     // Placeholder function to determine color based on the CID and mode
+            //     if (this.visualizationMode['futureProjection']) {
+            //         return 'lightblue'; // Example color for future projections
+            //     }
+            //     return 'grey'; // Default color
+            // },
         },
 
     }

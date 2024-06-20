@@ -16,14 +16,6 @@
 <script>
     export default{
         data(){
-            const enabledCIDs = [
-            "Cold spell",
-            "River flood",
-            "Severe wind storm",
-            "Permafrost",
-            "Coastal flood",
-            "Radiation at surface"
-        ];
 
             return{
                 categories:[
@@ -103,6 +95,14 @@
                     })
                 })
                 this.$emit('cid-selection-changed',selectedItems);
+            },
+            resetCheckboxes(){
+                this.categories.forEach(category => {
+                    category.items.forEach(item => {
+                        item.selected = false;
+                    })
+                })
+                this.emitSelectedCIDs();
             },
         },
     }

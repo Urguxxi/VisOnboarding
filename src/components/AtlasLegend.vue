@@ -15,7 +15,7 @@ export default{
     methods:{
         emitMode(mode){
             this.$emit('visualization-mode-changed', mode);
-            alert('click succeeds!');
+            // alert('click succeeds!');
         }
     }
 }

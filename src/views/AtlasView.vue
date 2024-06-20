@@ -1,9 +1,9 @@
 <template>
     <div class="altasView">
-      <AtlasSidebar class="left" @cid-selection-changed="updateSelectedCIDs"/>
+      <AtlasSidebar class="left" @cid-selection-changed="updateSelectedCIDs" ref="sidebarComponent"/>
       <AtlasLegend class="right-bottom" @visualization-mode-changed="updateActiveVisualizationMode"/>
       <IntroTitle class="right-top" :isChecked="isHexVizActive" @toggleChanged="handleToggle" @hexClicked="handleHexClick" @backToAtlas="handleBackToAtlas"/>
-      <component class="right-top" :is="currentComponent" :selected-cids="selectedCIDs" :visualization-mode="visualizationMode" @toggleChanged="handleToggle" />        
+      <component class="right-top" :is="currentComponent" :selected-cids="selectedCIDs" :visualization-mode="visualizationMode" :display-config="currentDisplayConfig" @toggleChanged="handleToggle" />        
     </div>
     <br>
 </template>
@@ -52,6 +52,12 @@ export default {
       deep: true  // This ensures the watcher triggers even for nested property changes
     }
   },
+  computed:{
+    currentDisplayConfig(){
+      // generate a configuration based on the selected CIDs and visualization mode
+      return this.generateDisplayConfig(this.selectedCIDs, this.visualizationMode);
+    }
+  },
   methods:{
     handleHexClick(){
       this.currentComponent = 'HexViz';
@@ -62,6 +68,17 @@ export default {
     handleToggle(){
       this.isHexVizActive = !this.isHexVizActive;
       this.currentComponent = this.currentComponent === 'AtlasViz' ? 'HexViz':'AtlasViz';
+      this.resetAllStates();
+    },
+    resetAllStates(){
+      // this.updateSelectedCIDs([]);
+      this.visualizationMode = {
+        futureProjection: false,
+        confidence: false,
+        observedTrend: false,
+        attribution: false,
+      };
+      this.$refs.sidebarComponent.resetCheckboxes();
     },
     // To update the CIDs selected in the sidebar
     updateSelectedCIDs(selectedItems){
@@ -72,6 +89,13 @@ export default {
       // Toggle mode activation
       if (this.visualizationMode[mode]){
         this.visualizationMode[mode] = false;
+        // confidence depends on the existence of futureProjection
+        if(mode === "futureProjection"){
+          this.visualizationMode["confidence"] = false;
+        }
+        else if(mode === "observedTrend"){
+          this.visualizationMode["attribution"] = false;
+        }
       }
       else{
         // The update should take the dependencied into consideration
@@ -85,6 +109,36 @@ export default {
         }        
         this.visualizationMode[mode] = true;
       }
+    },
+    generateDisplayConfig(cids,mode){
+      const config = {
+        triangles:[], // arrays to hold the triangle configurations
+        messages:[], // msg or description to be displayed
+      };
+
+      // To define how many triangles each CID will occuoy
+      const trianglesPerCID = {
+        1: 6, // 1 CID selected, occupy 6 triangles
+        2: 3,
+        3: 2,
+        4: 1, // the other 2 stay blank
+        5: 1,
+        6: 1,
+      };
+
+      const numCIDs = cids.length;
+      const numTriangles = trianglesPerCID[numCIDs] || 0;
+
+      // Generate triangles for each CID
+      // cids.forEach((cid, index) => {
+      //   for (let i = 0, i < numTriangles; i++){
+      //     config.triangles.push({
+      //       cid: cid,
+      //       mode: this.determineMode(modes, cid)
+      //     });
+      //   }
+      // });
+
     },
   }
 }
