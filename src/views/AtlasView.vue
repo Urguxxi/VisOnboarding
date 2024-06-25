@@ -70,14 +70,15 @@ export default {
       this.currentComponent = this.currentComponent === 'AtlasViz' ? 'HexViz':'AtlasViz';
       this.resetAllStates();
     },
+    // To reset the buttons and checkboxes into default
     resetAllStates(){
-      // this.updateSelectedCIDs([]);
       this.visualizationMode = {
         futureProjection: false,
         confidence: false,
         observedTrend: false,
         attribution: false,
       };
+      // When reset the checkbox, the selected CIDs will be reset as well
       this.$refs.sidebarComponent.resetCheckboxes();
     },
     // To update the CIDs selected in the sidebar
@@ -111,23 +112,23 @@ export default {
       }
     },
     generateDisplayConfig(cids,mode){
-      const config = {
-        triangles:[], // arrays to hold the triangle configurations
-        messages:[], // msg or description to be displayed
-      };
+      // const config = {
+      //   triangles:[], // arrays to hold the triangle configurations
+      //   messages:[], // msg or description to be displayed
+      // };
 
-      // To define how many triangles each CID will occuoy
-      const trianglesPerCID = {
-        1: 6, // 1 CID selected, occupy 6 triangles
-        2: 3,
-        3: 2,
-        4: 1, // the other 2 stay blank
-        5: 1,
-        6: 1,
-      };
+      // // To define how many triangles each CID will occuoy
+      // const trianglesPerCID = {
+      //   1: 6, // 1 CID selected, occupy 6 triangles
+      //   2: 3,
+      //   3: 2,
+      //   4: 1, // the other 2 stay blank
+      //   5: 1,
+      //   6: 1,
+      // };
 
-      const numCIDs = cids.length;
-      const numTriangles = trianglesPerCID[numCIDs] || 0;
+      // const numCIDs = cids.length;
+      // const numTriangles = trianglesPerCID[numCIDs] || 0;
 
       // Generate triangles for each CID
       // cids.forEach((cid, index) => {

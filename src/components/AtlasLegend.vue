@@ -5,7 +5,7 @@
         <button class="var">Observed Trend</button>
         <button class="var">Attribution</button> -->
         <button v-for="mode in ['futureProjection', 'confidence', 'observedTrend', 'attribution']" class="var" :key="mode" @click="emitMode(mode)">
-            {{mode}}
+            {{formatMode(mode)}}
         </button>
     </div>
 </template>
@@ -16,7 +16,13 @@ export default{
         emitMode(mode){
             this.$emit('visualization-mode-changed', mode);
             // alert('click succeeds!');
-        }
+        },
+        formatMode(mode) {
+        // Split the mode on each uppercase letter
+        const words = mode.replace(/([A-Z])/g, ' $1').trim();
+        // Capitalize the first letter of each word
+        return words.charAt(0).toUpperCase() + words.slice(1);
+    },
     }
 }
 </script>

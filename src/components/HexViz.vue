@@ -8,12 +8,19 @@
 
 <script>
     import * as d3 from 'd3';
+    import {regionsData} from '@/data/cidsData';
 
     export default{
         name:'HexViz',
         props: ['selectedCids', 'visualizationMode','displayConfig'],
+        data(){
+            return{
+                regionData: null,
+            };
+        },
         mounted() {
             this.renderViz();
+            this.fetchRegionData('GIC');
         },
         watch:{
             selectedCids:{
@@ -32,12 +39,19 @@
             }
         },
         methods:{
+            // To fetch the particular data matched the regionCode, we use GIC region for the onboarding system as the example
+            fetchRegionData(regionCode){
+                const region = regionsData.find(r => r.region === regionCode);
+                if(region){
+                    this.regionData = region.cids;
+                }
+            },
             handleBackClick(){
                 this.$emit('backToAtlas');
             },
             computeTrianglePoints(index, radius, centerX, centerY) {
                 // This is a placeholder function for computing triangle vertices
-                radius = radius -10;
+                radius = radius - 10;
                 const angle = Math.PI / 3 * index + Math.PI / 6;
                 const nextAngle = angle + Math.PI / 3;
                 return [
@@ -115,15 +129,15 @@
 
 
                 // *To test if the mode is updated
-                if(this.visualizationMode['futureProjection']){
-                    svg.append('polygon')
-                    .attr('points',hexagonPoints1(50))
-                    .attr('transform','translate(200,400)')
-                    .attr('id','ice')
-                    .style('stroke','pink')
-                    .style('fill','black')
-                    .style('stroke-width',3);
-                }
+                // if(this.visualizationMode['futureProjection']){
+                //     svg.append('polygon')
+                //     .attr('points',hexagonPoints1(50))
+                //     .attr('transform','translate(200,400)')
+                //     .attr('id','ice')
+                //     .style('stroke','pink')
+                //     .style('fill','black')
+                //     .style('stroke-width',3);
+                // }
             },
 
             determineColor(cid) {
