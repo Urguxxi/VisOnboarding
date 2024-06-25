@@ -117,14 +117,42 @@
                 .style('stroke-width',5);
 
                 // Dynamically draw the triangles based on the selected CIDs and the main HEX
-                this.selectedCids.forEach((cid, index) => {
+                this.selectedCids.forEach((cidName, index) => {
+                    // To fetch cid data respectively
+                    const cidData = this.regionData.find(cid => cid.name === cidName);
+                    if(!cidData) {
+                        alert(cidName+": Nodata!");
+                        return;
+                    }
+
                     // To compute the triangles vertices based on the index?
                     const trianglePoints = this.computeTrianglePoints(index, hexRadius, hexCenterX, hexCenterY);
                     svg.append('polygon')
                     .attr('points', trianglePoints)
-                    .style('fill',this.determineColor(cid))
+                    .style('fill',this.determineColor(cidName))
                     .style('stroke', 'orange')
                     .style('stroke-width', 3);
+
+                    // To compute the data of confidence
+                    let confidenceRadius = 0;
+                    if(cidData.confidence){
+                        if(cidData.confidence === 'high'){
+                            confidenceRadius = hexRadius;
+                        }
+                        if(cidData.confidence === 'medium'){
+                            confidenceRadius = hexRadius * 2 / 3;
+                        }
+                        if(cidData.confidence === 'low'){
+                            confidenceRadius = hexRadius / 3;
+                        }
+                    }
+
+                    const dataTrianglePoints = this.computeTrianglePoints(index, confidenceRadius, hexCenterX,hexCenterY);
+                    svg.append('polygon')
+                    .attr('points', dataTrianglePoints)
+                    .style('fill',this.determineColor(cidName))
+                    .style('stroke', 'yellow')
+                    .style('stroke-width', 4);
                 })
 
 

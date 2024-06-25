@@ -3,14 +3,14 @@ export const regionsData = [
         region:"GIC",
         cids:[
             {            
-                name: "Cold Spell",
+                name: "Cold spell",
                 futureProjection: "decreasing",
                 confidence: "medium",
                 observedTrend: "downward",
                 attribution: "low"
             },
             {
-                name: "River Flood",
+                name: "River flood",
                 futureProjection: "increasing",
                 confidence: "high",
                 observedTrend: "upward",
