@@ -55,7 +55,8 @@ export default {
   computed:{
     currentDisplayConfig(){
       // generate a configuration based on the selected CIDs and visualization mode
-      return this.generateDisplayConfig(this.selectedCIDs, this.visualizationMode);
+      // return this.generateDisplayConfig(this.selectedCIDs, this.visualizationMode);
+      return this.generateDisplayConfig();
     }
   },
   methods:{
@@ -111,7 +112,8 @@ export default {
         this.visualizationMode[mode] = true;
       }
     },
-    generateDisplayConfig(cids,mode){
+    // cids,mode
+    generateDisplayConfig(){
       // const config = {
       //   triangles:[], // arrays to hold the triangle configurations
       //   messages:[], // msg or description to be displayed
@@ -130,7 +132,7 @@ export default {
       // const numCIDs = cids.length;
       // const numTriangles = trianglesPerCID[numCIDs] || 0;
 
-      // Generate triangles for each CID
+      // // Generate triangles for each CID
       // cids.forEach((cid, index) => {
       //   for (let i = 0, i < numTriangles; i++){
       //     config.triangles.push({

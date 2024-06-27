@@ -25,6 +25,7 @@
         watch:{
             selectedCids:{
                 handler(){
+                    this.maybeClearCanvas();
                     this.renderViz();
                 },
                 deep: true,
@@ -32,6 +33,7 @@
             },
             visualizationMode:{
                 handler(){
+                    this.maybeClearCanvas();
                     this.renderViz();
                 },
                 deep: true,
@@ -48,6 +50,13 @@
             },
             handleBackClick(){
                 this.$emit('backToAtlas');
+            },
+            maybeClearCanvas(){
+                // Clear the svg canvas only if a mode that requires exclusive drawing is actived
+                if(this.visualizationMode.confidence || this.visualizationMode.attribution){
+                    const container = d3.select(this.$refs.hexContainer);
+                    container.selectAll('svg').remove();
+                }
             },
             computeTrianglePoints(index, radius, centerX, centerY) {
                 // This is a placeholder function for computing triangle vertices
@@ -126,33 +135,25 @@
                     }
 
                     // To compute the triangles vertices based on the index?
-                    const trianglePoints = this.computeTrianglePoints(index, hexRadius, hexCenterX, hexCenterY);
-                    svg.append('polygon')
-                    .attr('points', trianglePoints)
-                    .style('fill',this.determineColor(cidName))
-                    .style('stroke', 'orange')
-                    .style('stroke-width', 3);
+                    const baseTrianglePoints = this.computeTrianglePoints(index, hexRadius, hexCenterX, hexCenterY);
+                    const futureTrianglePoints = this.computeTrianglePoints(index, hexRadius*5/6, hexCenterX, hexCenterY);
 
-                    // To compute the data of confidence
-                    let confidenceRadius = 0;
-                    if(cidData.confidence){
-                        if(cidData.confidence === 'high'){
-                            confidenceRadius = hexRadius;
-                        }
-                        if(cidData.confidence === 'medium'){
-                            confidenceRadius = hexRadius * 2 / 3;
-                        }
-                        if(cidData.confidence === 'low'){
-                            confidenceRadius = hexRadius / 3;
-                        }
+                    // Default triangle if no specific mode is activated
+                    if(Object.values(this.visualizationMode).every(v => !v)) {
+                        this.drawDefaultTriangle(svg, baseTrianglePoints, cidName);
                     }
 
-                    const dataTrianglePoints = this.computeTrianglePoints(index, confidenceRadius, hexCenterX,hexCenterY);
-                    svg.append('polygon')
-                    .attr('points', dataTrianglePoints)
-                    .style('fill',this.determineColor(cidName))
-                    .style('stroke', 'yellow')
-                    .style('stroke-width', 4);
+                    // Handle Future Projection
+                    if(this.visualizationMode.futureProjection && (!this.visualizationMode.confidence)) {
+                        this.drawFutureProjectionTriangle(svg, baseTrianglePoints, futureTrianglePoints, cidData, cidName);
+                    }
+
+                    // Handle Confidence
+                    if(this.visualizationMode.confidence) {
+                        this.drawConfidenceTriangle(svg, baseTrianglePoints, cidData, cidName, hexRadius, hexCenterX, hexCenterY);
+                    }
+
+                    
                 })
 
 
@@ -166,6 +167,46 @@
                 //     .style('fill','black')
                 //     .style('stroke-width',3);
                 // }
+            },
+            drawDefaultTriangle(svg, points, cidName) {
+                svg.append('polygon')
+                    .attr('points', points)
+                    .style('fill', this.determineColor(cidName))
+                    .style('stroke', 'orange')
+                    .style('stroke-width', 3);
+            },
+            drawFutureProjectionTriangle(svg, pointsDefault, pointFuture, cidData, cidName) {
+                if(cidData.futureProjection === "decreasing"){
+                    svg.append('polygon')
+                    .attr('points', pointsDefault)
+                    .style('fill', 'black')
+                    .style('stroke', 'black')
+                    .style('stroke-width', 5);
+                }
+
+                svg.append('polygon')
+                    .attr('points', pointFuture)
+                    .style('fill', this.determineColor(cidName))
+                    .style('stroke', 'black')
+                    .style('stroke-width', 5);
+                
+            },
+            drawConfidenceTriangle(svg, points, cidData, cidName, hexRadius, hexCenterX, hexCenterY) {
+                let confidenceRadius = this.getConfidenceRadius(cidData.confidence, hexRadius);
+                const confidencePoints = this.computeTrianglePoints(0, confidenceRadius, hexCenterX, hexCenterY);
+                svg.append('polygon')
+                    .attr('points', confidencePoints)
+                    .style('fill', this.determineColor(cidName))
+                    .style('stroke', 'yellow')
+                    .style('stroke-width', 4);
+            },
+            getConfidenceRadius(confidence, hexRadius) {
+                switch (confidence) {
+                    case 'high': return hexRadius;
+                    case 'medium': return hexRadius * 2 / 3;
+                    case 'low': return hexRadius / 3;
+                    default: return 0;
+                }
             },
 
             determineColor(cid) {
