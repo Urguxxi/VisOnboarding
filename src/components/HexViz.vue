@@ -2,7 +2,6 @@
     <div class="hexViz" ref="hexContainer">
         Hey it's the onboarding for a single hexagon now!
         <button @click="handleBackClick">Back to Atlas</button>
-        <!-- <p>{{displayConfig.message}}</p> -->
     </div>
 </template>
 
@@ -136,7 +135,7 @@
 
                     // To compute the triangles vertices based on the index?
                     const baseTrianglePoints = this.computeTrianglePoints(index, hexRadius, hexCenterX, hexCenterY);
-                    const futureTrianglePoints = this.computeTrianglePoints(index, hexRadius*5/6, hexCenterX, hexCenterY);
+                    const futureTrianglePoints = this.computeTrianglePoints(index, hexRadius*9/10, hexCenterX, hexCenterY);
 
                     // Default triangle if no specific mode is activated
                     if(Object.values(this.visualizationMode).every(v => !v)) {
@@ -150,23 +149,12 @@
 
                     // Handle Confidence
                     if(this.visualizationMode.confidence) {
-                        this.drawConfidenceTriangle(svg, baseTrianglePoints, cidData, cidName, hexRadius, hexCenterX, hexCenterY);
+                        this.drawConfidenceTriangle(svg, index, cidData, cidName, hexRadius, hexCenterX, hexCenterY);
                     }
 
                     
                 })
 
-
-                // *To test if the mode is updated
-                // if(this.visualizationMode['futureProjection']){
-                //     svg.append('polygon')
-                //     .attr('points',hexagonPoints1(50))
-                //     .attr('transform','translate(200,400)')
-                //     .attr('id','ice')
-                //     .style('stroke','pink')
-                //     .style('fill','black')
-                //     .style('stroke-width',3);
-                // }
             },
             drawDefaultTriangle(svg, points, cidName) {
                 svg.append('polygon')
@@ -182,23 +170,47 @@
                     .style('fill', 'black')
                     .style('stroke', 'black')
                     .style('stroke-width', 5);
-                }
 
-                svg.append('polygon')
+                    svg.append('polygon')
                     .attr('points', pointFuture)
                     .style('fill', this.determineColor(cidName))
                     .style('stroke', 'black')
                     .style('stroke-width', 5);
+                }
+                else{
+                    svg.append('polygon')
+                    .attr('points', pointsDefault)
+                    .style('fill', this.determineColor(cidName))
+                    .style('stroke', 'black')
+                    .style('stroke-width', 5);
+                }
                 
             },
-            drawConfidenceTriangle(svg, points, cidData, cidName, hexRadius, hexCenterX, hexCenterY) {
+            drawConfidenceTriangle(svg, index, cidData, cidName, hexRadius, hexCenterX, hexCenterY) {
                 let confidenceRadius = this.getConfidenceRadius(cidData.confidence, hexRadius);
-                const confidencePoints = this.computeTrianglePoints(0, confidenceRadius, hexCenterX, hexCenterY);
-                svg.append('polygon')
-                    .attr('points', confidencePoints)
-                    .style('fill', this.determineColor(cidName))
-                    .style('stroke', 'yellow')
-                    .style('stroke-width', 4);
+                let confidencePoints = this.computeTrianglePoints(index, confidenceRadius, hexCenterX, hexCenterY);
+                let smallConfidencePoints = this.computeTrianglePoints(index, confidenceRadius*9/10, hexCenterX, hexCenterY);
+                if(cidData.futureProjection === "decreasing"){
+                    svg.append('polygon')
+                        .attr('points', confidencePoints)
+                        .style('fill', 'black')
+                        .style('stroke', 'black')
+                        .style('stroke-width', 4);
+
+                    svg.append('polygon')
+                        .attr('points', smallConfidencePoints)
+                        .style('fill', this.determineColor(cidName))
+                        .style('stroke', 'black')
+                        .style('stroke-width', 4);
+                }
+                else{
+                    svg.append('polygon')
+                        .attr('points', confidencePoints)
+                        .style('fill', this.determineColor(cidName))
+                        .style('stroke', 'black')
+                        .style('stroke-width', 4);
+                }
+
             },
             getConfidenceRadius(confidence, hexRadius) {
                 switch (confidence) {

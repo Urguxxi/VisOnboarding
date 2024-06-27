@@ -14,8 +14,36 @@ export const regionsData = [
                 futureProjection: "increasing",
                 confidence: "high",
                 observedTrend: "upward",
-                attribution: "high"
-            },            
+                attribution: ""
+            },  
+            {
+                name: "Severe wind storm",
+                futureProjection: "increasing",
+                confidence: "low",
+                observedTrend: "",
+                attribution: ""
+            }, 
+            {
+                name: "Permafrost",
+                futureProjection: "decreasing",
+                confidence: "high",
+                observedTrend: "downward",
+                attribution: ""
+            },
+            {
+                name: "Coastal flood",
+                futureProjection: "increasing",
+                confidence: "medium",
+                observedTrend: "",
+                attribution: ""
+            }, 
+            {
+                name: "Radiation at surface",
+                futureProjection: "decreasing",
+                confidence: "medium",
+                observedTrend: "",
+                attribution: ""
+            }, 
         ]
     },
     {
