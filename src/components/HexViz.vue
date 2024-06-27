@@ -206,7 +206,7 @@
 
                     // Default triangle if no specific mode is activated
                     if(Object.values(this.visualizationMode).every(v => !v)) {
-                        this.drawDefaultTriangle(svg, strokeTrianglePoints, baseTrianglePoints, cidName);
+                        this.drawDefaultTriangle(svg, index, hexRadius, hexCenterX, hexCenterY, cidName);
                     }
 
                     // Handle Future Projection
@@ -219,22 +219,26 @@
                         this.drawConfidenceTriangle(svg, index, cidData, cidName, hexRadius, hexCenterX, hexCenterY);
                     }
 
-                    
                 })
 
             },
-            drawDefaultTriangle(svg, strokePoints, basePoints, cidName) {
+            drawDefaultTriangle(svg, index, radius, x, y, cidName) {
+                // use switch to decide the offset for each triangle
+                switch(index){
+                    case 0: x = x+3; y = y+5; break;
+                    case 1: x = x-3; y = y+5; break;
+                    case 2: x = x-6; y = y; break;
+                    case 3: x = x-3; y = y-5; break;
+                    case 4: x = x+3; y = y-5; break;
+                    case 5: x = x+6; break;
+                };
+
                 svg.append('polygon')
-                    .attr('points', basePoints)
+                    .attr('points', this.computeTrianglePoints(index, radius-10, x, y))
                     .style('fill', 'none')
                     .style('stroke', this.determineColor(cidName))
                     .style('stroke-width', 5);
 
-                // svg.append('polygon')
-                // .attr('points', strokePoints)
-                // .style('fill', 'none')
-                // .style('stroke', 'lightsteelblue')
-                // .style('stroke-width', 5);
             },
             drawFutureProjectionTriangle(svg, pointsDefault, pointFuture, cidData, cidName) {
                 if(cidData.futureProjection === "decreasing"){
