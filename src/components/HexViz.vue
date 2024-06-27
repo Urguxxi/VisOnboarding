@@ -220,12 +220,21 @@
                     }
 
                     // Handle Observed Trend
-                    if (this.visualizationMode.observedTrend && cidData.observedTrend) {
-                        this.drawTrendArrow(svg, cidData.observedTrend, index, hexRadius, hexCenterX, hexCenterY, 'black');
+                    if (this.visualizationMode.observedTrend) {
+                        if(cidData.observedTrend){
+                            this.drawTrendArrow(svg, cidData.observedTrend, index, hexRadius, hexCenterX, hexCenterY, 'black');
+                        }
+                        // Ensure there are default triangles when future projection is not activated
+                        if(!this.visualizationMode.futureProjection){
+                            this.drawDefaultTriangle(svg, index, hexRadius, hexCenterX, hexCenterY, cidName);
+                        }
                     }
 
                     // Handle Attribution
                     if(this.visualizationMode.attribution){
+                        if(!this.visualizationMode.futureProjection){
+                            this.drawDefaultTriangle(svg, index, hexRadius, hexCenterX, hexCenterY, cidName);
+                        }
                         let color;
                         if(cidData.attribution){
                             switch(cidData.attribution){
