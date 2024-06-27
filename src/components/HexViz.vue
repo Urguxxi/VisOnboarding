@@ -87,7 +87,7 @@
                 selectedCids.forEach((cidName, index) => {
                     let color = this.determineColor(cidName);
                     let startAngle = angleStep * index + Math.PI / 6; // Adjust angle for flat top hexagon
-                    let endAngle = startAngle + angleStep;
+                    // let endAngle = startAngle + angleStep;
 
                     // Calculate start and end points for each bar
                     let midX = hexCenterX + (hexRadius-10) * Math.cos(startAngle + angleStep / 2);
@@ -200,7 +200,7 @@
                     }
 
                     // To compute the triangles vertices based on the index?
-                    const strokeTrianglePoints = this.computeTrianglePoints(index, hexRadius, hexCenterX, hexCenterY);
+                    // const strokeTrianglePoints = this.computeTrianglePoints(index, hexRadius, hexCenterX, hexCenterY);
                     const baseTrianglePoints = this.computeTrianglePoints(index, hexRadius-5, hexCenterX, hexCenterY);
                     const futureTrianglePoints = this.computeTrianglePoints(index, hexRadius*9/10, hexCenterX, hexCenterY);
 
@@ -219,22 +219,34 @@
                         this.drawConfidenceTriangle(svg, index, cidData, cidName, hexRadius, hexCenterX, hexCenterY);
                     }
 
+                    // Handle Observed Trend
+                    if (this.visualizationMode.observedTrend && cidData.observedTrend) {
+                        this.drawTrendArrow(svg, cidData.observedTrend, index, hexRadius, hexCenterX, hexCenterY, 'black');
+                    }
+
+                    // Handle Attribution
+                    if(this.visualizationMode.attribution){
+                        let color;
+                        if(cidData.attribution){
+                            switch(cidData.attribution){
+                                case 'high':
+                                    color = 'red';
+                                    break;
+                                case 'low':
+                                    color = 'blue';
+                            }
+                            this.drawTrendArrow(svg, cidData.observedTrend, index, hexRadius, hexCenterX, hexCenterY, color);
+                        }
+                    }
+
                 })
 
             },
             drawDefaultTriangle(svg, index, radius, x, y, cidName) {
-                // use switch to decide the offset for each triangle
-                switch(index){
-                    case 0: x = x+3; y = y+5; break;
-                    case 1: x = x-3; y = y+5; break;
-                    case 2: x = x-6; y = y; break;
-                    case 3: x = x-3; y = y-5; break;
-                    case 4: x = x+3; y = y-5; break;
-                    case 5: x = x+6; break;
-                };
+                const {offsetX,offsetY} = this.determineOffset(index, x, y);
 
                 svg.append('polygon')
-                    .attr('points', this.computeTrianglePoints(index, radius-10, x, y))
+                    .attr('points', this.computeTrianglePoints(index, radius-10, offsetX, offsetY))
                     .style('fill', 'none')
                     .style('stroke', this.determineColor(cidName))
                     .style('stroke-width', 5);
@@ -287,7 +299,6 @@
                         .style('stroke', 'white')
                         .style('stroke-width', 4);
                 }
-
             },
             getConfidenceRadius(confidence, hexRadius) {
                 switch (confidence) {
@@ -296,6 +307,63 @@
                     case 'low': return hexRadius / 3;
                     default: return 0;
                 }
+            },
+            drawTrendArrow(svg, trend, index, radius, centerX, centerY, color){
+            // Calculate start and end points based on the index for precise directional placement
+                const angle = Math.PI / 3 * index + Math.PI / 2 - Math.PI / 6; // adjust angle to align with hexagon side
+                const extendFactor = 0.5; // Extend the arrow slightly beyond the hexagon edge for clarity
+
+                // Settings of the upward trend arrow
+                let offset1 = 15
+                let startX = centerX + offset1 * Math.cos(angle) * extendFactor;
+                let startY = centerY + offset1 * Math.sin(angle) * extendFactor;
+                let endX = centerX + (radius+offset1) * Math.cos(angle) * extendFactor;
+                let endY = centerY + (radius+offset1) * Math.sin(angle) * extendFactor;
+
+                if (trend === 'downward') {
+                    // Swap start and end points for downward trend
+                    let offset2 = 60;
+                    [startX, endX] = [endX, startX];
+                    [startY, endY] = [endY, startY];
+                    startY = startY + offset2 * Math.sin(angle);
+                    startX = startX + offset2 * Math.cos(angle);
+                    endY = endY + offset2 * Math.sin(angle);
+                    endX = endX + offset2 * Math.cos(angle);
+                }
+
+                // Setup the arrow marker
+                // Ensure the unique id for each arrow marker
+                let arrowId = 'arrow'+ index + color;
+
+                let defs = svg.select('defs');
+                if(defs.empty()){
+                    defs = svg.append('defs');
+                }
+
+                // Check if marker already exists, if not, create a new marker
+                if(defs.select(`#${arrowId}`).empty()){
+                    defs.append('marker')
+                        .attr('id', arrowId)
+                        .attr('viewBox', '0 0 10 10')
+                        .attr('refX', 5)
+                        .attr('refY', 5)
+                        .attr('markerWidth', 6)
+                        .attr('markerHeight', 6)
+                        .attr('orient', 'auto')
+                        .append('path')
+                        .attr('d', 'M 0 0 L 10 5 L 0 10 Z')
+                        .style('fill', color);
+                }
+
+                // Draw the arrow line
+                svg.append('line')
+                    .attr('x1', startX)
+                    .attr('y1', startY)
+                    .attr('x2', endX)
+                    .attr('y2', endY)
+                    .style('stroke', color)
+                    .style('stroke-width', 4)
+                    .attr('marker-end', `url(#${arrowId})`);
             },
             determineColor(cid) {
                 const colors = {
@@ -309,6 +377,37 @@
                 };
                 return colors[cid] || '#eeeeee'; // Default color if CID is not found
             },
+            determineOffset(index, x, y) {
+                let offsetX = x;
+                let offsetY = y;
+                switch (index) {
+                    case 0:
+                        offsetX = x + 3;
+                        offsetY = y + 5;
+                        break;
+                    case 1:
+                        offsetX = x - 3;
+                        offsetY = y + 5;
+                        break;
+                    case 2:
+                        offsetX = x - 6;
+                        break;
+                    case 3:
+                        offsetX = x - 3;
+                        offsetY = y - 5;
+                        break;
+                    case 4:
+                        offsetX = x + 3;
+                        offsetY = y - 5;
+                        break;
+                    case 5:
+                        offsetX = x + 6;
+                        break;
+                    default:
+                        break;  // Keeps original x, y if no case matches
+                }
+                return { offsetX, offsetY }; // Return modified coordinates as an object
+            }
         },
 
     }
