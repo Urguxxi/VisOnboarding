@@ -53,7 +53,7 @@ export default {
         const svg = d3.select(this.$el)
         .append('svg')
         .attr('width', 1500)
-        .attr('height', 550)
+        .attr('height', 586)
         .append('g')
         .attr('transform', 'translate(20, 0)');
 
