@@ -1,7 +1,10 @@
 <template>
     <div class="hexViz" ref="hexContainer">
         Hey it's the onboarding for a single hexagon now!
-        <button @click="handleBackClick">Back to Atlas</button>
+        <!-- <button @click="handleBackClick">Back to Atlas</button> -->
+        <div class="comment-info">
+            *USING DATA OF GREENLAND/ICELAND(GIC) AS EXAMPLE
+        </div>
     </div>
 </template>
 
@@ -90,8 +93,8 @@
                     // let endAngle = startAngle + angleStep;
 
                     // Calculate start and end points for each bar
-                    let midX = hexCenterX + (hexRadius-10) * Math.cos(startAngle + angleStep / 2);
-                    let midY = hexCenterY + (hexRadius-10) * Math.sin(startAngle + angleStep / 2);
+                    let midX = hexCenterX + (hexRadius - 10) * Math.cos(startAngle + angleStep / 2);
+                    let midY = hexCenterY + (hexRadius - 10) * Math.sin(startAngle + angleStep / 2);
 
                     // Determine rotation angle in degrees and add 90 degrees for parallel alignment
                     let rotationAngle = (startAngle + angleStep / 2) * 180 / Math.PI + 90;
@@ -167,27 +170,27 @@
                 // Draw the default background triangels
                 // Draw it manually cuz each triangle needs different offset
                     svg.append('polygon')
-                    .attr('points', this.computeTrianglePoints(0, hexRadius-8, hexCenterX+3, hexCenterY+5))
+                    .attr('points', this.computeTrianglePoints(0, hexRadius - 8, hexCenterX + 3, hexCenterY + 5))
                     .attr('fill','#CDCDCD')
 
                     svg.append('polygon')
-                    .attr('points', this.computeTrianglePoints(1, hexRadius-8, hexCenterX-3, hexCenterY+5))
+                    .attr('points', this.computeTrianglePoints(1, hexRadius - 8, hexCenterX - 3, hexCenterY + 5))
                     .attr('fill','#CDCDCD')
 
                     svg.append('polygon')
-                    .attr('points', this.computeTrianglePoints(2, hexRadius-8, hexCenterX-6, hexCenterY))
+                    .attr('points', this.computeTrianglePoints(2, hexRadius - 8, hexCenterX - 6, hexCenterY))
                     .attr('fill','#CDCDCD')
 
                     svg.append('polygon')
-                    .attr('points', this.computeTrianglePoints(3, hexRadius-8, hexCenterX-3, hexCenterY-5))
+                    .attr('points', this.computeTrianglePoints(3, hexRadius - 8, hexCenterX - 3, hexCenterY - 5))
                     .attr('fill','#CDCDCD')
 
                     svg.append('polygon')
-                    .attr('points', this.computeTrianglePoints(4, hexRadius-8, hexCenterX+3, hexCenterY-5))
+                    .attr('points', this.computeTrianglePoints(4, hexRadius - 8, hexCenterX + 3, hexCenterY - 5))
                     .attr('fill','#CDCDCD')
 
                     svg.append('polygon')
-                    .attr('points', this.computeTrianglePoints(5, hexRadius-8, hexCenterX+6, hexCenterY))
+                    .attr('points', this.computeTrianglePoints(5, hexRadius - 8, hexCenterX + 6, hexCenterY))
                     .attr('fill','#CDCDCD')
 
                 // Dynamically draw the triangles based on the selected CIDs and the main HEX
@@ -201,8 +204,8 @@
 
                     // To compute the triangles vertices based on the index?
                     // const strokeTrianglePoints = this.computeTrianglePoints(index, hexRadius, hexCenterX, hexCenterY);
-                    const baseTrianglePoints = this.computeTrianglePoints(index, hexRadius-5, hexCenterX, hexCenterY);
-                    const futureTrianglePoints = this.computeTrianglePoints(index, hexRadius*9/10, hexCenterX, hexCenterY);
+                    const baseTrianglePoints = this.computeTrianglePoints(index, hexRadius - 5, hexCenterX, hexCenterY);
+                    const futureTrianglePoints = this.computeTrianglePoints(index, hexRadius * 9 / 10, hexCenterX, hexCenterY);
 
                     // Default triangle if no specific mode is activated
                     if(Object.values(this.visualizationMode).every(v => !v)) {
@@ -255,7 +258,7 @@
                 const {offsetX,offsetY} = this.determineOffset(index, x, y);
 
                 svg.append('polygon')
-                    .attr('points', this.computeTrianglePoints(index, radius-10, offsetX, offsetY))
+                    .attr('points', this.computeTrianglePoints(index, radius - 10, offsetX, offsetY))
                     .style('fill', 'none')
                     .style('stroke', this.determineColor(cidName))
                     .style('stroke-width', 5);
@@ -287,7 +290,7 @@
             drawConfidenceTriangle(svg, index, cidData, cidName, hexRadius, hexCenterX, hexCenterY) {
                 let confidenceRadius = this.getConfidenceRadius(cidData.confidence, hexRadius);
                 let confidencePoints = this.computeTrianglePoints(index, confidenceRadius, hexCenterX, hexCenterY);
-                let smallConfidencePoints = this.computeTrianglePoints(index, confidenceRadius*9/10, hexCenterX, hexCenterY);
+                let smallConfidencePoints = this.computeTrianglePoints(index, confidenceRadius * 9 / 10, hexCenterX, hexCenterY);
                 if(cidData.futureProjection === "decreasing"){
                     svg.append('polygon')
                         .attr('points', confidencePoints)
@@ -426,5 +429,12 @@
     .hexViz{
         background-color: rgba(206, 221, 239, 0.424);
         margin-left:10px;
+    }
+    .comment-info{
+        position: absolute;
+        bottom: 120px;
+        right: 30px;
+        text-align: right;
+        font-size: 15px;
     }
 </style>

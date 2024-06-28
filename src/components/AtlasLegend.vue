@@ -37,6 +37,7 @@ export default{
     flex: 1;
     align-items: center;
     max-height: 100%;
+    margin-top: 10px;
 }
 
 .var {

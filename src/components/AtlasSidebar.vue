@@ -2,13 +2,24 @@
     <div class="sidebar">
         <h3 class="title">Choose from CIDs</h3>
         <div v-for="(category, index) in categories" :key="index" class="category">
-            <h3>{{category.name}}</h3>
-            <div class="items">
-                <div v-for="item in category.items" :key="item.name" class="item">
-                    <input type="checkbox" v-model="item.selected" :id="item.name" @change="emitSelectedCIDs" :disabled="item.disabled">
-                    <label :for="item.name">{{item.name}}</label>
+            <div class="category-container">
+                
+                <h3>{{category.name}}</h3>    
+                
+                <div>
+                    
+                    <div class="items" :style="{ position:'relative' }">
+                        <div class="color-bar" :style="{ backgroundColor: getCategoryColor(category.name), height:calculateBarHeight(category.items.length)}"></div>
+                        <div v-for="item in category.items" :key="item.name" class="item">
+                            <input type="checkbox" v-model="item.selected" :id="item.name" @change="emitSelectedCIDs" :disabled="item.disabled">
+                            <label :for="item.name">{{item.name}}</label>
+                        </div>
+                    </div>
                 </div>
+
             </div>
+
+            
         </div>
     </div>
 </template>
@@ -104,6 +115,21 @@
                 })
                 this.emitSelectedCIDs();
             },
+            getCategoryColor(categoryName) {
+                switch (categoryName) {
+                    case 'Heat and Cold': return '#4BB132';
+                    case 'Wet and Dry': return '#EF8F37';
+                    case 'Wind': return '#C1A0CA';
+                    case 'Snow and Ice': return '#FA4F97';
+                    case 'Coastal': return '#A3CF5B';
+                    case 'Others': return '#EFDD3A';
+                    default: return '#000'; // Default color if category not matched
+                }
+            },
+            calculateBarHeight(itemCount) {
+                const baseHeight = 21; // Base height per item
+                return `${baseHeight * itemCount}px`; // Adjust this formula as needed
+            },
         },
     }
 </script>
@@ -115,6 +141,19 @@
     max-height: 100%;
     overflow-y: auto;
 }
+.sidebar .category-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.color-bar{
+    position: absolute;
+    width: 5px;
+    height: 100%;
+}
+.items{
+    padding-left: 10px;
+}
 .category h3{
     font-size: 16px;
     margin-top: 3px;
@@ -123,6 +162,7 @@
 .items .item{
     font-size: 13px;
     margin-bottom: 1px;
+    padding-left: 10px;
 }
 .title{
     font-size: 22px;
