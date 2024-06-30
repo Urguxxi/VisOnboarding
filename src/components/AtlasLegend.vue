@@ -4,7 +4,7 @@
             {{formatMode(mode)}}
         </button> -->
 
-        <div v-for="mode in Object.keys(modes)" :key="mode" class="var-container">
+        <div v-for="mode in Object.keys(visualizationMode)" :key="mode" class="var-container">
             <button v-if="!displayImage[mode]" @click="toggleMode(mode)" class="var">
                 {{ formatMode(mode) }}
             </button>
@@ -15,23 +15,24 @@
 
 <script>
 export default{
-    data(){
-        return{
-            modes: {
-                futureProjection: false,
-                confidence: false,
-                observedTrend: false,
-                attribution: false
-            }
-        }
-    },
+    props: ['visualizationMode'],
+    // data(){
+    //     return{
+    //         visualizationMode: {
+    //             futureProjection: false,
+    //             confidence: false,
+    //             observedTrend: false,
+    //             attribution: false
+    //         }
+    //     }
+    // },
     computed:{
         displayImage(){
             return{
-                futureProjection: this.modes.futureProjection,
-                confidence: this.modes.futureProjection && this.modes.confidence,
-                observedTrend: this.modes.observedTrend,
-                attribution: this.modes.observedTrend && this.modes.attribution
+                futureProjection: this.visualizationMode.futureProjection,
+                confidence: this.visualizationMode.futureProjection && this.visualizationMode.confidence,
+                observedTrend: this.visualizationMode.observedTrend,
+                attribution: this.visualizationMode.observedTrend && this.visualizationMode.attribution
             }
         }
     },
@@ -46,28 +47,7 @@ export default{
             return words.charAt(0).toUpperCase() + words.slice(1);
         },
         toggleMode(mode) {
-            if (mode === 'confidence' && !this.modes.futureProjection) {
-                alert("Confidence requires Future Projection to be active.");
-                return;
-            }
-            if (mode === 'attribution' && !this.modes.observedTrend) {
-                alert("Attribution requires Observed Trend to be active.");
-                return;
-            }
-
-            // Toggle the mode if no dependency issues
-            this.modes[mode] = !this.modes[mode];
-
-            // Automatically deactivate dependent modes
-            if (!this.modes[mode]) {
-                if (mode === 'futureProjection') {
-                    this.modes.confidence = false;
-                }
-                if (mode === 'observedTrend') {
-                    this.modes.attribution = false;
-                }
-            }
-            this.$emit('visualization-mode-changed', mode, this.modes[mode]);
+            this.$emit('visualization-mode-changed', mode, this.visualizationMode[mode]);
         },
         getImage(mode) {
             // Dynamically import image based on the mode

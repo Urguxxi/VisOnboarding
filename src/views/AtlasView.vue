@@ -1,7 +1,7 @@
 <template>
     <div class="altasView">
       <AtlasSidebar class="left" @cid-selection-changed="updateSelectedCIDs" ref="sidebarComponent"/>
-      <AtlasLegend class="right-bottom" @visualization-mode-changed="updateActiveVisualizationMode"/>
+      <AtlasLegend class="right-bottom" :visualization-mode="visualizationMode" @visualization-mode-changed="updateActiveVisualizationMode"/>
       <IntroTitle class="right-top" :isChecked="isHexVizActive" @toggleChanged="handleToggle" @hexClicked="handleHexClick" @backToAtlas="handleBackToAtlas"/>
       <component class="right-top" :is="currentComponent" :selected-cids="selectedCIDs" :visualization-mode="visualizationMode" :display-config="currentDisplayConfig" @toggleChanged="handleToggle" />        
     </div>
