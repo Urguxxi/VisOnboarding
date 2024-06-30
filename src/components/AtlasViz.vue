@@ -11,7 +11,9 @@
     max-height: 100%;
 }
 .atlasTitle{
-    margin-left:380px;
+    margin-left:400px;
+    margin-right: 60px;
+    text-align: right;
 }
 </style>
 
@@ -599,7 +601,7 @@ export default {
         }
 
         // set a deault radius
-        const hexRadius = 35;
+        const hexRadius = 38;
         const x = 150;
         const y = 60;
         drawAtlas(hexRadius,x,y);
@@ -615,16 +617,6 @@ export default {
 
         svg.select('#gic').on('click',()=>{this.handleClick()});
 
-        // To test if the mode is updated
-        if(this.visualizationMode['futureProjection']){
-            svg.append('polygon')
-            .attr('points',hexagonPoints(50))
-            .attr('transform','translate(200,400)')
-            .attr('id','ice')
-            .style('stroke','pink')
-            .style('fill','black')
-            .style('stroke-width',3);
-        }
     },
   },
 

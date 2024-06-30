@@ -1,28 +1,78 @@
 <template>
     <div class="lengend">
-        <!-- <button class="var">Future Projection</button>
-        <button class="var">Condfidence</button>
-        <button class="var">Observed Trend</button>
-        <button class="var">Attribution</button> -->
-        <button v-for="mode in ['futureProjection', 'confidence', 'observedTrend', 'attribution']" class="var" :key="mode" @click="emitMode(mode)">
+        <!-- <button v-for="mode in ['futureProjection', 'confidence', 'observedTrend', 'attribution']" class="var" :key="mode" @click="emitMode(mode)">
             {{formatMode(mode)}}
-        </button>
+        </button> -->
+
+        <div v-for="mode in Object.keys(modes)" :key="mode" class="var-container">
+            <button v-if="!displayImage[mode]" @click="toggleMode(mode)" class="var">
+                {{ formatMode(mode) }}
+            </button>
+            <img  v-else @click="toggleMode(mode)" :src="getImage(mode)" class="var-image">
+        </div>
     </div>
 </template>
 
 <script>
 export default{
+    data(){
+        return{
+            modes: {
+                futureProjection: false,
+                confidence: false,
+                observedTrend: false,
+                attribution: false
+            }
+        }
+    },
+    computed:{
+        displayImage(){
+            return{
+                futureProjection: this.modes.futureProjection,
+                confidence: this.modes.futureProjection && this.modes.confidence,
+                observedTrend: this.modes.observedTrend,
+                attribution: this.modes.observedTrend && this.modes.attribution
+            }
+        }
+    },
     methods:{
         emitMode(mode){
             this.$emit('visualization-mode-changed', mode);
-            // alert('click succeeds!');
         },
         formatMode(mode) {
-        // Split the mode on each uppercase letter
-        const words = mode.replace(/([A-Z])/g, ' $1').trim();
-        // Capitalize the first letter of each word
-        return words.charAt(0).toUpperCase() + words.slice(1);
-    },
+            // Split the mode on each uppercase letter
+            const words = mode.replace(/([A-Z])/g, ' $1').trim();
+            // Capitalize the first letter of each word
+            return words.charAt(0).toUpperCase() + words.slice(1);
+        },
+        toggleMode(mode) {
+            if (mode === 'confidence' && !this.modes.futureProjection) {
+                alert("Confidence requires Future Projection to be active.");
+                return;
+            }
+            if (mode === 'attribution' && !this.modes.observedTrend) {
+                alert("Attribution requires Observed Trend to be active.");
+                return;
+            }
+
+            // Toggle the mode if no dependency issues
+            this.modes[mode] = !this.modes[mode];
+
+            // Automatically deactivate dependent modes
+            if (!this.modes[mode]) {
+                if (mode === 'futureProjection') {
+                    this.modes.confidence = false;
+                }
+                if (mode === 'observedTrend') {
+                    this.modes.attribution = false;
+                }
+            }
+            this.$emit('visualization-mode-changed', mode, this.modes[mode]);
+        },
+        getImage(mode) {
+            // Dynamically import image based on the mode
+            return require(`@/assets/${mode}.png`)
+        },
     }
 }
 </script>
@@ -38,6 +88,12 @@ export default{
     align-items: center;
     max-height: 100%;
     margin-top: 10px;
+}
+
+.var-container{
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 
 .var {
@@ -60,8 +116,10 @@ export default{
   touch-action: manipulation;
   margin-left: 2%;
   margin-right: 2%;
-  width: 20%;
-  height: 50%;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  width: 80%;
+  height: 100%;
 
 }
 
@@ -76,6 +134,12 @@ export default{
 
 .var:focus-visible {
   box-shadow: none;
+}
+
+.var-image{
+    width: fit-content;
+    height: 120px;
+    object-fit: contain;
 }
         
 </style>
