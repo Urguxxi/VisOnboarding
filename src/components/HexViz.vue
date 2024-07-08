@@ -2,6 +2,8 @@
     <div class="hexViz" ref="hexContainer">
         Hey it's the onboarding for a single hexagon now!
         <!-- <button @click="handleBackClick">Back to Atlas</button> -->
+        <div v-if="explanationText" class="explanatory-text" v-html="explanationText">
+        </div>
         <div class="comment-info">
             *USING DATA OF GREENLAND/ICELAND(GIC) AS EXAMPLE
         </div>
@@ -18,6 +20,9 @@
         data(){
             return{
                 regionData: null,
+                currentMode:'',
+                previousModeState:{},
+                // explanationText: "",
             };
         },
         mounted() {
@@ -34,13 +39,35 @@
                 immediate: true
             },
             visualizationMode:{
-                handler(){
+                handler(newVal){
                     this.maybeClearCanvas();
                     this.renderViz();
+                    // Compare newVal with the previous state
+                    const changedMode = Object.keys(newVal).find(mode => newVal[mode] !== this.previousModeState[mode]);
+                    console.log(this.changedMode)
+                    if (changedMode && newVal[changedMode]) { // Check if the mode has changed and is true
+                        this.currentMode = changedMode;
+                    }
+                    // Update the previous state with a deep copy of the new value
+                    this.previousModeState = {...newVal};
+                    
                 },
                 deep: true,
                 immediate: true
             }
+        },
+        computed:{
+            explanationText() {
+                // Checking which mode is currently active from last to first and return the appropriate text
+                const modeDescriptions = {
+                    futureProjection: "The normal triangle indicates the <strong>increasing</strong> trend of the CID in the future; \nIt means <strong>decreasing</strong> trend if with the <strong>pedestal</strong>.",
+                    confidence: "Different sizes stand for different extents of confidence; \n\nThere are <strong>Low/Medium/High</strong> 3 different sizes.",
+                    observedTrend: "The direction of the arrow indicates the observed trend of CID in the past. \n\n<strong>Upward</strong> trend (arrow points to the edge of hexagon) \n<strong>Downward</strong> trend (arrow points to the center of hexagon).",
+                    attribution: "If the arrow isn’t black, the color of the arrow shows there is <strong>additional evidence on attribution</strong> of this observed trend, and how the confidence of the attribution. \n\n<strong>Red</strong> arrow means a high confidence attribution; \n<strong>Blue</strong> arrow means a low confidence attribution.",
+                };
+                return this.currentMode ? modeDescriptions[this.currentMode] : ""; 
+            }
+
         },
         methods:{
             // To fetch the particular data matched the regionCode, we use GIC region for the onboarding system as the example
@@ -128,6 +155,7 @@
             renderViz(){
                 const container = d3.select(this.$refs.hexContainer);
                 container.selectAll('svg').remove(); // To clear up the canva to redraw
+                this.explanationText = "";
 
                 // draw the d3 canvas
                 const svg = d3.select(this.$el) 
@@ -215,11 +243,16 @@
                     // Handle Future Projection
                     if(this.visualizationMode.futureProjection && (!this.visualizationMode.confidence)) {
                         this.drawFutureProjectionTriangle(svg, baseTrianglePoints, futureTrianglePoints, cidData, cidName);
+
+                        // draw the explanation
+                        // this.drawExplanation("futureProjection");
                     }
 
                     // Handle Confidence
                     if(this.visualizationMode.confidence) {
                         this.drawConfidenceTriangle(svg, index, cidData, cidName, hexRadius, hexCenterX, hexCenterY);
+
+                        // this.drawExplanation("confidence");
                     }
 
                     // Handle Observed Trend
@@ -231,6 +264,8 @@
                         if(!this.visualizationMode.futureProjection){
                             this.drawDefaultTriangle(svg, index, hexRadius, hexCenterX, hexCenterY, cidName);
                         }
+
+                        // this.drawExplanation("observedTrend");
                     }
 
                     // Handle Attribution
@@ -249,6 +284,8 @@
                             }
                             this.drawTrendArrow(svg, cidData.observedTrend, index, hexRadius, hexCenterX, hexCenterY, color);
                         }
+
+                        // this.drawExplanation("attribution");
                     }
 
                 })
@@ -285,7 +322,6 @@
                     .style('stroke', 'white')
                     .style('stroke-width', 5);
                 }
-                
             },
             drawConfidenceTriangle(svg, index, cidData, cidName, hexRadius, hexCenterX, hexCenterY) {
                 let confidenceRadius = this.getConfidenceRadius(cidData.confidence, hexRadius);
@@ -311,6 +347,7 @@
                         .style('stroke', 'white')
                         .style('stroke-width', 4);
                 }
+
             },
             getConfidenceRadius(confidence, hexRadius) {
                 switch (confidence) {
@@ -377,6 +414,16 @@
                     .style('stroke-width', 4)
                     .attr('marker-end', `url(#${arrowId})`);
             },
+            drawExplanation(mode){
+                this.explanationText = "";
+                switch(mode){
+                    case "futureProjection" : this.explanationText =  "The normal triangle indicates the <strong>increasing</strong> trend of the CID in the future; \n\nIt means <strong>decreasing</strong> trend if with the <strong>pedestal</strong>"; break;
+                    case "confidence" : this.explanationText =  "Different sizes stand for different  extents of confidence; \n\nThere are Low/Medium/High 3 different sizes"; break;
+                    case "observedTrend" : this.explanationText =  "The direction of the arrow indicates the observed trend of CID in the past. \n\n<strong>Upward</strong> trend (arrow points to the edge of hexogan)\n<strong>Downward</strong> trend (arrow points to the center of hexogan);"; break;
+                    case "attribution" : this.explanationText =  "If the arrow isn’t black, the color of arrow shows there is <strong>additional evidence on attribution</strong> of this observed trend, and how the confidence of the attribution.\n\n<strong>Red</strong> arrow means a high confidence attribution; \n<strong>Blue</strong> arrow means a low confidence attribution"; break;
+                    case "" : break;
+                }
+            },
             determineColor(cid) {
                 const colors = {
                     'Cold spell': '#49D0AD',
@@ -436,5 +483,19 @@
         right: 30px;
         text-align: right;
         font-size: 15px;
+    }
+    .explanatory-text {
+        position:absolute;
+        bottom: 50%;
+        left: 78%; 
+        width: 17%; /* Adjust width as needed */
+        text-align: left;
+        font-size: 25px;
+        color: #333;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 10px;
+        padding-left: 15px;
+        border-radius: 5px;
+        white-space: pre-wrap;
     }
 </style>
