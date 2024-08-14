@@ -10,6 +10,5 @@ module.exports = defineConfig({
         pathRewrite:{'^/api': ''},
       }
     },
-    // base: '/client/public'
   }
 });
