@@ -1,5 +1,6 @@
 const { defineConfig } = require('@vue/cli-service');
 module.exports = defineConfig({
+  // publicPath: '/VisOnboarding/',
   transpileDependencies: true,
   devServer:{
     proxy:{
@@ -8,6 +9,7 @@ module.exports = defineConfig({
         changeOrigin: true,
         pathRewrite:{'^/api': ''},
       }
-    }
+    },
+    base: '/client/public'
   }
 });
